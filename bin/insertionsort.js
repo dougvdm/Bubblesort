@@ -2,12 +2,10 @@ const fs = require('fs');
 const path = require('path');
 
 // Definindo path para o arquivo a ser lido e onde salvar o novo arquivo
-
 const inputPathArquivo = path.join(__dirname, 'arq.txt'); 
-const outputPathArquivo = path.join(__dirname, 'bubblesort_JS.txt'); 
+const outputPathArquivo = path.join(__dirname, 'insertionsort_JS.txt'); 
 
 // Array para manipular os numeros
-
 let arrayNumeros = [];
 
 // Função para printar o uso de memoria e o tempo de execução
@@ -20,8 +18,7 @@ function printPerformance(startTime, startMemory) {
     console.log('  Heap Used: %d KB', endMemory.heapUsed / 1024);
 }
 
-// Função para ler o arquivo e adicionar no Array criado a cima
-
+// Função para ler o arquivo e adicionar no Array criado acima
 function lerArquivo(filePath, callback) {
     const startTime = process.hrtime();
     const startMemory = process.memoryUsage();
@@ -33,11 +30,11 @@ function lerArquivo(filePath, callback) {
             return;
         }
         
-        // Separando os numeros pela quebra de linha
+        // Separando os números pela quebra de linha
         const linhas = data.split('\n');
-        // Criando um mapa com os numeros
+        // Criando um mapa com os números
         const numeros = linhas.map(linhas => parseFloat(linhas.trim())).filter(num => !isNaN(num));
-        // Adicionando os numeros ao array
+        // Adicionando os números ao array
         arrayNumeros = arrayNumeros.concat(numeros); 
         // Usando a função para o print da performance
         printPerformance(startTime, startMemory);
@@ -46,17 +43,21 @@ function lerArquivo(filePath, callback) {
     });
 }
 
-// Função de Bubble Sort
-function bubbleSort(arr) {
-    let len = arr.length;
-    for (let i = 0; i < len; i++) {
-        for (let j = 0; j < len - 1 - i; j++) {
-            if (arr[j] > arr[j + 1]) {
-                let temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-            }
+// Função de Insertion Sort
+function insertionSort(arr) {
+    let n = arr.length;
+    for (let i = 1; i < n; i++) {
+        let key = arr[i];
+        let j = i - 1;
+        
+        // Move os elementos maiores que a chave para uma posição à frente
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
         }
+        
+        // Coloca a chave na posição correta
+        arr[j + 1] = key;
     }
 }
 
@@ -83,7 +84,7 @@ function escreverArquivo(filePath, numerosArray, callback) {
 
 // Função de callback para usar o array após a leitura, ordenação e gravação
 function ordenarESalvar() {
-    bubbleSort(arrayNumeros);
+    insertionSort(arrayNumeros); // Usando Insertion Sort
     escreverArquivo(outputPathArquivo, arrayNumeros, () => {
         console.log('Processo concluído.');
     });

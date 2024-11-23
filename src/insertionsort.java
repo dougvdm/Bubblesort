@@ -3,13 +3,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class bubblesort {
+public class insertionsort {
     // Caminhos dos arquivos
     private static final String inputPathArquivo = "arq.txt";
-    private static final String outputPathArquivo = "bubblesort_Java.txt";
+    private static final String outputPathArquivo = "insertionsort_Java.txt";
 
     // Lista para armazenar os números
     private static List<Double> numerosList = new ArrayList<>();
@@ -22,7 +21,7 @@ public class bubblesort {
 
         lerNumeros(inputPathArquivo);
         
-        bubbleSort(numerosList);
+        insertionSort(numerosList);
 
         escreverArquivo(outputPathArquivo);
 
@@ -34,7 +33,7 @@ public class bubblesort {
         System.out.println("Processo concluído.");
     }
 
-    // Função para ler os numeros do arquivo e colocar no ArrayList
+    // Função para ler os números do arquivo e colocar no ArrayList
     private static void lerNumeros(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String linha;
@@ -51,15 +50,19 @@ public class bubblesort {
         }
     }
 
-    // Função para ordenar o ArrayList
-    private static void bubbleSort(List<Double> list) {
+    // Função para ordenar o ArrayList usando Insertion Sort
+    private static void insertionSort(List<Double> list) {
         int n = list.size();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (list.get(j) > list.get(j + 1)) {
-                    Collections.swap(list, j, j + 1);
-                }
+        for (int i = 1; i < n; i++) {
+            double key = list.get(i);
+            int j = i - 1;
+
+            // Mover os elementos de list[0..i-1], que são maiores que o key, para uma posição à frente
+            while (j >= 0 && list.get(j) > key) {
+                list.set(j + 1, list.get(j));
+                j = j - 1;
             }
+            list.set(j + 1, key);
         }
     }
 
@@ -74,7 +77,7 @@ public class bubblesort {
         }
     }
 
-    // Função para printar o tempo de execução e a memoria usada
+    // Função para printar o tempo de execução e a memória usada
     private static void printPerformance(long startTime, long endTime, long startMemory, long endMemory) {
         long elapsedTime = endTime - startTime;
         long usedMemory = (endMemory - startMemory) / 1024; // em KB
@@ -82,5 +85,4 @@ public class bubblesort {
         System.out.println("Tempo de execução: " + (elapsedTime / 1000) + "s " + (elapsedTime % 1000) + "ms");
         System.out.println("Memória usada: " + usedMemory + " KB");
     }
-    
 }

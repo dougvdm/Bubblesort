@@ -4,7 +4,7 @@ const path = require('path');
 // Definindo path para o arquivo a ser lido e onde salvar o novo arquivo
 
 const inputPathArquivo = path.join(__dirname, 'arq.txt'); 
-const outputPathArquivo = path.join(__dirname, 'arquivo_ordenadoJS.txt'); 
+const outputPathArquivo = path.join(__dirname, 'bubblesort_JS.txt'); 
 
 // Array para manipular os numeros
 
