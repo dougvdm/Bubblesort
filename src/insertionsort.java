@@ -37,7 +37,7 @@ public class insertionsort {
         System.out.printf("Memória RAM: %.2f GB%n%n", totalMemory / (1024.0 * 1024.0 * 1024.0));
 
         // Arquivo de entrada e saída
-        String inputFile = "/workspaces/Bubblesort/src/arq.txt";
+        String inputFile = "/src/arq.txt";
         String outputFile = "insertionsort_Java.txt";
 
         try {
