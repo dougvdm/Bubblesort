@@ -1,86 +1,97 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 public class bubblesort {
-    // Caminhos dos arquivos
-    private static final String inputPathArquivo = "arq.txt";
-    private static final String outputPathArquivo = "bubblesort_Java.txt";
 
-    // Lista para armazenar os números
-    private static List<Double> numerosList = new ArrayList<>();
-
-    // Main para rodar tudo
-    public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
-        Runtime runtime = Runtime.getRuntime();
-        long startMemory = runtime.totalMemory() - runtime.freeMemory();
-
-        lerNumeros(inputPathArquivo);
-        
-        bubbleSort(numerosList);
-
-        escreverArquivo(outputPathArquivo);
-
-        long endTime = System.currentTimeMillis();
-        long endMemory = runtime.totalMemory() - runtime.freeMemory();
-
-        printPerformance(startTime, endTime, startMemory, endMemory);
-
-        System.out.println("Processo concluído.");
-    }
-
-    // Função para ler os numeros do arquivo e colocar no ArrayList
-    private static void lerNumeros(String filePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                try {
-                    double numeros = Double.parseDouble(linha.trim());
-                    numerosList.add(numeros);
-                } catch (NumberFormatException e) {
-                    // Ignorar linhas que não são números
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
-        }
-    }
-
-    // Função para ordenar o ArrayList
-    private static void bubbleSort(List<Double> list) {
-        int n = list.size();
-        for (int i = 0; i < n - 1; i++) {
+    // Função de ordenação Bubble Sort
+    public static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n; i++) {
             for (int j = 0; j < n - i - 1; j++) {
-                if (list.get(j) > list.get(j + 1)) {
-                    Collections.swap(list, j, j + 1);
+                if (arr[j] > arr[j + 1]) {
+                    // Troca os elementos
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
                 }
             }
         }
     }
 
-    // Função para escrever no arquivo novo
-    private static void escreverArquivo(String filePath) {
-        try (FileWriter fw = new FileWriter(filePath)) {
-            for (Double numero : numerosList) {
-                fw.write(numero + "\n");
+    public static void main(String[] args) {
+        // Informações da linguagem e sistema
+        System.out.println("Linguagem: Java");
+        System.out.println("Versão: " + System.getProperty("java.version"));
+
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        System.out.println("Sistema Operacional: " + osName + " " + osVersion);
+
+        String cpuInfo = getCpuInfo();
+        System.out.println("CPU: " + cpuInfo);
+
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        System.out.printf("Memória RAM: %.2f GB%n%n", totalMemory / (1024.0 * 1024.0 * 1024.0));
+
+        // Arquivo de entrada e saída
+        String inputFile = "/workspaces/Bubblesort/src/arq.txt";
+        String outputFile = "bubblesort_Java.txt";
+
+        try {
+            // Lendo o arquivo
+            List<String> lines = Files.readAllLines(Paths.get(inputFile));
+            List<Integer> numbers = new ArrayList<>();
+
+            for (String line : lines) {
+                if (!line.trim().isEmpty()) {
+                    numbers.add(Integer.parseInt(line.trim()));
+                }
             }
+
+            int[] arr = numbers.stream().mapToInt(Integer::intValue).toArray();
+
+            // Bubble Sort
+            long start = System.nanoTime();
+            bubbleSort(arr);
+            long end = System.nanoTime();
+
+            // Salvando em arquivo de saída
+            List<String> sortedNumbers = new ArrayList<>();
+            for (int num : arr) {
+                sortedNumbers.add(String.valueOf(num));
+            }
+            Files.write(Paths.get(outputFile), sortedNumbers);
+
+            // Informações de tempo e memória
+            double tempoMs = (end - start) / 1e6;
+            double memoriaKb = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            System.out.printf("Tempo de execução: %.2f ms%n", tempoMs);
+            System.out.printf("Memória utilizada: %.2f KB%n", memoriaKb / 1024.0);
+
         } catch (IOException e) {
-            System.err.println("Erro ao gravar o arquivo: " + e.getMessage());
+            System.err.println("Erro: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.err.println("Erro ao converter número: " + e.getMessage());
         }
     }
 
-    // Função para printar o tempo de execução e a memoria usada
-    private static void printPerformance(long startTime, long endTime, long startMemory, long endMemory) {
-        long elapsedTime = endTime - startTime;
-        long usedMemory = (endMemory - startMemory) / 1024; // em KB
-
-        System.out.println("Tempo de execução: " + (elapsedTime / 1000) + "s " + (elapsedTime % 1000) + "ms");
-        System.out.println("Memória usada: " + usedMemory + " KB");
+    // Função para obter informações do CPU
+    private static String getCpuInfo() {
+        String cpuInfo = "Informação não disponível";
+        try {
+            Process process = Runtime.getRuntime().exec("lscpu");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("Model name")) {
+                    cpuInfo = line.split(":")[1].trim();
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao obter informações do CPU: " + e.getMessage());
+        }
+        return cpuInfo;
     }
-    
 }
