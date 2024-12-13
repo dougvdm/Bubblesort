@@ -35,7 +35,7 @@ public class bubblesort {
         System.out.printf("Memória RAM: %.2f GB%n%n", totalMemory / (1024.0 * 1024.0 * 1024.0));
 
         // Arquivo de entrada e saída
-        String inputFile = "/src/arq.txt";
+        String inputFile = "arq.txt";
         String outputFile = "bubblesort_Java.txt";
 
         try {

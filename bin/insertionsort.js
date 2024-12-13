@@ -1,94 +1,57 @@
 const fs = require('fs');
-const path = require('path');
+const os = require('os');
 
-// Definindo path para o arquivo a ser lido e onde salvar o novo arquivo
-const inputPathArquivo = path.join(__dirname, 'arq.txt'); 
-const outputPathArquivo = path.join(__dirname, 'insertionsort_JS.txt'); 
-
-// Array para manipular os numeros
-let arrayNumeros = [];
-
-// Função para printar o uso de memoria e o tempo de execução
-function printPerformance(startTime, startMemory) {
-    const endTime = process.hrtime(startTime);
-    const endMemory = process.memoryUsage();
-    
-    console.log('Tempo de execução: %ds %dms', endTime[0], endTime[1] / 1e6);
-    console.log('Memória usada:');
-    console.log('  Heap Used: %d KB', endMemory.heapUsed / 1024);
-}
-
-// Função para ler o arquivo e adicionar no Array criado acima
-function lerArquivo(filePath, callback) {
-    const startTime = process.hrtime();
-    const startMemory = process.memoryUsage();
-
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        // Caso de erro
-        if (err) {
-            console.error('Erro ao ler o arquivo:', err);
-            return;
-        }
-        
-        // Separando os números pela quebra de linha
-        const linhas = data.split('\n');
-        // Criando um mapa com os números
-        const numeros = linhas.map(linhas => parseFloat(linhas.trim())).filter(num => !isNaN(num));
-        // Adicionando os números ao array
-        arrayNumeros = arrayNumeros.concat(numeros); 
-        // Usando a função para o print da performance
-        printPerformance(startTime, startMemory);
-        // Usando a função de callback
-        callback();
-    });
-}
-
-// Função de Insertion Sort
+// Função de ordenação Bubble Sort
 function insertionSort(arr) {
     let n = arr.length;
     for (let i = 1; i < n; i++) {
         let key = arr[i];
         let j = i - 1;
-        
-        // Move os elementos maiores que a chave para uma posição à frente
+
+        // Move elementos do array que são maiores que 'key' uma posição para frente
         while (j >= 0 && arr[j] > key) {
             arr[j + 1] = arr[j];
             j--;
         }
-        
-        // Coloca a chave na posição correta
+
+        // Insere o 'key' na posição correta
         arr[j + 1] = key;
     }
 }
 
-// Função para gravar o array ordenado em um novo arquivo
-function escreverArquivo(filePath, numerosArray, callback) {
-    const data = numerosArray.join('\n') + '\n'; // Formata os números como linhas separadas
+// Função principal
+function main() {
+    // Informações da linguagem e sistema
+    console.log("Linguagem: JavaScript (Node.js)");
+    console.log(`Versão: ${process.version}`);
+    console.log(`Sistema Operacional: ${os.type()} ${os.release()}`);
+    console.log(`CPU: ${os.cpus()[0].model}`);
+    console.log(`Memória RAM: ${(os.totalmem() / (1024 ** 3)).toFixed(2)} GB\n`);
 
-    const startTime = process.hrtime();
-    const startMemory = process.memoryUsage();
+    // Lendo o arquivo
+    const inputFile = 'src/arq.txt';
+    const outputFile = 'insertionsort_JS.txt';
 
-    fs.writeFile(filePath, data, 'utf8', (err) => {
-        if (err) {
-            console.error('Erro ao gravar o arquivo:', err);
-            return;
-        }
-        console.log('Arquivo gravado com sucesso:', filePath);
+    try {
+        const data = fs.readFileSync(inputFile, 'utf8');
+        const numeros = data.split('\n').filter(line => line.trim() !== '').map(Number);
 
-        // Mensurar o desempenho após a gravação do arquivo
-        printPerformance(startTime, startMemory);
+        // Bubble Sort
+        const start = process.hrtime();
+        insertionSort(numeros);
+        const end = process.hrtime(start);
 
-        callback();
-    });
+        // Salvando em arquivo de saída
+        fs.writeFileSync(outputFile, numeros.join('\n'), 'utf8');
+
+        // Informações de tempo e memória
+        const tempoMs = (end[0] * 1000) + (end[1] / 1e6);
+        const memoriaKb = process.memoryUsage().heapUsed / 1024;
+        console.log(`Tempo de execução: ${tempoMs.toFixed(2)} ms`);
+        console.log(`Memória utilizada: ${memoriaKb.toFixed(2)} KB`);
+    } catch (err) {
+        console.error(`Erro: ${err.message}`);
+    }
 }
 
-// Função de callback para usar o array após a leitura, ordenação e gravação
-function ordenarESalvar() {
-    insertionSort(arrayNumeros); // Usando Insertion Sort
-    escreverArquivo(outputPathArquivo, arrayNumeros, () => {
-        console.log('Processo concluído.');
-    });
-}
-
-// Chamando a função para iniciar o programa
-lerArquivo(inputPathArquivo, ordenarESalvar);
+main();
